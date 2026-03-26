@@ -2,6 +2,12 @@
 
 Run Cursor self-hosted cloud agents on Render without Kubernetes.
 
+## YOLO!
+
+This repository is a demo meant to show one way to run Cursor self-hosted cloud agents on Render. It is intentionally minimal and optimized for clarity over production hardening.
+
+Use it as a reference starting point, then adapt security, reliability, and operational guardrails for your own environment before running it in production.
+
 This example deploys:
 
 - a Render worker that runs `agent worker start`
