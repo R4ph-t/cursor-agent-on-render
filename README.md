@@ -10,6 +10,10 @@ This example deploys:
 
 Use this example to run Cursor workers on Render for teams that want self-hosted execution without managing Kubernetes.
 
+## TEST
+
+This repository is a demo reference implementation for testing and evaluation. It is meant to show how the pieces fit together, not to serve as a production-ready deployment without further hardening and customization.
+
 ## Why this exists
 
 Cursor self-hosted cloud agents keep code and tool execution in your own network while Cursor handles orchestration and model access. The worker connects outbound over HTTPS, so you do not need inbound ports or VPN tunnels. That model fits Render well: you can run the worker as a managed background service and pair it with a small web service for triggers and notifications.
