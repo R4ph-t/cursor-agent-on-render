@@ -76,8 +76,10 @@ For production, prefer a Cursor service account API key when your plan supports 
 
 - `CURSOR_API_KEY`: API key used to call the Cursor Cloud Agents API
 - `CURSOR_TARGET_REPOSITORY`: the single repository this deployment will launch agents against
-- `TRIGGER_BASE_URL`: public base URL of the trigger API, used to build Cursor webhook callbacks
+- `TRIGGER_HOST`: trigger service host used to build the public callback URL as `https://<host>.onrender.com`
 - `CURSOR_WEBHOOK_SECRET`: shared secret for verifying Cursor webhook callbacks
+
+For local development or non-Render deployments, you can set `TRIGGER_BASE_URL` as an override.
 
 ### Optional provider variables
 
@@ -127,7 +129,7 @@ Example command body:
 branch=main autopr=true Fix the flaky auth test
 ```
 
-The trigger service verifies the Slack signature, launches a Cursor agent, and returns the agent URL immediately. If `TRIGGER_BASE_URL` and `CURSOR_WEBHOOK_SECRET` are set, it also posts a completion update back to the same Slack thread via `response_url`.
+The trigger service verifies the Slack signature, launches a Cursor agent, and returns the agent URL immediately. If `TRIGGER_HOST` and `CURSOR_WEBHOOK_SECRET` are set, it also posts a completion update back to the same Slack thread via `response_url`.
 
 ### Linear
 

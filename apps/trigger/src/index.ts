@@ -77,6 +77,7 @@ const config = {
     process.env.DEFAULT_SKIP_REVIEWER_REQUEST,
     false,
   ),
+  triggerHost: process.env.TRIGGER_HOST,
   triggerBaseUrl: process.env.TRIGGER_BASE_URL,
   cursorWebhookSecret: process.env.CURSOR_WEBHOOK_SECRET,
   slackSigningSecret: process.env.SLACK_SIGNING_SECRET,
@@ -85,12 +86,17 @@ const config = {
   linearCommandPrefix: process.env.LINEAR_COMMAND_PREFIX || "@cursor",
 };
 
+const derivedTriggerBaseUrl = buildTriggerBaseUrl(
+  config.triggerHost,
+  config.triggerBaseUrl,
+);
+
 const webhookConfig =
-  config.triggerBaseUrl && config.cursorWebhookSecret
+  derivedTriggerBaseUrl && config.cursorWebhookSecret
     ? {
         url: new URL(
           "/webhooks/cursor",
-          withTrailingSlash(config.triggerBaseUrl),
+          withTrailingSlash(derivedTriggerBaseUrl),
         ).toString(),
         secret: config.cursorWebhookSecret,
       }
@@ -118,7 +124,7 @@ app.post("/v1/tasks", express.json(), async (req, res) => {
     if (body.notify && !webhookConfig) {
       return res.status(400).json({
         error:
-          "Notifications require both TRIGGER_BASE_URL and CURSOR_WEBHOOK_SECRET.",
+          "Notifications require a trigger URL source (TRIGGER_HOST or TRIGGER_BASE_URL) and CURSOR_WEBHOOK_SECRET.",
       });
     }
 
@@ -445,6 +451,25 @@ function parsePromptWithOptions(text: string): {
 
 function withTrailingSlash(input: string): string {
   return input.endsWith("/") ? input : `${input}/`;
+}
+
+function buildTriggerBaseUrl(
+  triggerHost: string | undefined,
+  triggerBaseUrl: string | undefined,
+): string | undefined {
+  if (triggerHost) {
+    if (/^https?:\/\//i.test(triggerHost)) {
+      return triggerHost;
+    }
+
+    if (triggerHost.includes(".")) {
+      return `https://${triggerHost}`;
+    }
+
+    return `https://${triggerHost}.onrender.com`;
+  }
+
+  return triggerBaseUrl;
 }
 
 function toRawBody(input: unknown): Buffer {

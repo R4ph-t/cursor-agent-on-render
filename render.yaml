@@ -28,8 +28,11 @@ projects:
                 value: "false"
               - key: DEFAULT_SKIP_REVIEWER_REQUEST
                 value: "false"
-              - key: TRIGGER_BASE_URL
-                sync: false
+              - key: TRIGGER_HOST
+                fromService:
+                  type: web
+                  name: cursor-trigger-api
+                  property: host
               - key: CURSOR_WEBHOOK_SECRET
                 sync: false
               - key: SLACK_SIGNING_SECRET
