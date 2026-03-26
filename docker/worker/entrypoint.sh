@@ -11,31 +11,32 @@ GIT_USERNAME="${CURSOR_GIT_USERNAME:-x-access-token}"
 
 mkdir -p "$(dirname "$WORKER_DIR")"
 
-auth_repository_url() {
-  local repo_url="$1"
-
-  if [[ -n "${CURSOR_GIT_TOKEN:-}" ]]; then
-    if [[ "$repo_url" != https://* ]]; then
-      echo "CURSOR_GIT_TOKEN currently supports only HTTPS clone URLs." >&2
-      exit 1
-    fi
-
-    echo "${repo_url/https:\/\//https://${GIT_USERNAME}:${CURSOR_GIT_TOKEN}@}"
+configure_git_auth() {
+  if [[ -z "${CURSOR_GIT_TOKEN:-}" ]]; then
     return
   fi
 
-  echo "$repo_url"
+  if [[ "$TARGET_REPOSITORY" != https://* ]]; then
+    echo "CURSOR_GIT_TOKEN currently supports only HTTPS repository URLs." >&2
+    exit 1
+  fi
+
+  local repo_host
+  repo_host="$(printf '%s' "$TARGET_REPOSITORY" | sed -E 's#https?://([^/]+)/.*#\1#')"
+
+  # Rewrites HTTPS git traffic for the target host so clone, fetch, and push
+  # all use the provided token without baking credentials into the remote URL.
+  git config --global \
+    "url.https://${GIT_USERNAME}:${CURSOR_GIT_TOKEN}@${repo_host}/.insteadOf" \
+    "https://${repo_host}/"
 }
 
 clone_or_update_repo() {
-  local source_url
-  source_url="$(auth_repository_url "$TARGET_REPOSITORY")"
-
   if [[ ! -d "$WORKER_DIR/.git" ]]; then
     rm -rf "$WORKER_DIR"
-    git clone "$source_url" "$WORKER_DIR"
+    git clone "$TARGET_REPOSITORY" "$WORKER_DIR"
   else
-    git -C "$WORKER_DIR" remote set-url origin "$source_url"
+    git -C "$WORKER_DIR" remote set-url origin "$TARGET_REPOSITORY"
     git -C "$WORKER_DIR" fetch origin --tags --prune
   fi
 
@@ -43,8 +44,6 @@ clone_or_update_repo() {
     git -C "$WORKER_DIR" fetch origin "$TARGET_REF" --depth 1
     git -C "$WORKER_DIR" checkout --detach FETCH_HEAD
   fi
-
-  git -C "$WORKER_DIR" remote set-url origin "$TARGET_REPOSITORY"
 }
 
 append_flag_if_set() {
@@ -57,6 +56,7 @@ append_flag_if_set() {
   fi
 }
 
+configure_git_auth
 clone_or_update_repo
 
 declare -a WORKER_ARGS

@@ -92,7 +92,7 @@ For local development or non-Render deployments, you can set `TRIGGER_BASE_URL` 
 - `CURSOR_API_KEY`: API key used by `agent worker start`
 - `CURSOR_TARGET_REPOSITORY`: repository cloned into the worker at startup
 - `CURSOR_TARGET_REF`: branch, tag, or commit to check out
-- `CURSOR_GIT_TOKEN`: token used for private HTTPS clones
+- `CURSOR_GIT_TOKEN`: token used for private HTTPS clone, fetch, and push operations
 
 The worker uses `CURSOR_TARGET_REPOSITORY` to clone a git checkout before starting Cursor. The trigger API uses the same repository setting and rejects mismatches. This keeps the repository identity explicit and avoids depending on the deployed app source tree.
 
@@ -192,7 +192,7 @@ This keeps the trigger service inexpensive while giving the worker more headroom
 - The worker only needs outbound HTTPS to Cursor.
 - No inbound port is required for the worker.
 - Secrets should be set in Render as environment variables, not committed.
-- If the target repository is private, give the worker a dedicated git token with the smallest useful scope.
+- If the target repository is private, give the worker a dedicated git token with the read and write access needed for branch and pull request workflows.
 
 ## Local development
 
