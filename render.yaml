@@ -21,7 +21,7 @@ projects:
               - key: DEFAULT_SOURCE_REF
                 value: main
               - key: DEFAULT_CURSOR_MODEL
-                value: default
+                value: gpt-5.4-high-fast
               - key: DEFAULT_AUTO_CREATE_PR
                 value: "true"
               - key: DEFAULT_OPEN_AS_CURSOR_GITHUB_APP

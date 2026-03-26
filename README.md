@@ -66,6 +66,8 @@ For production, prefer a Cursor service account API key when your plan supports 
 2. In Cursor, enable self-hosted agents in the Cloud Agents dashboard.
 3. In Render, create a new Blueprint and point it at this repository.
 4. Fill in the required environment variables.
+   The Blueprint defaults `DEFAULT_CURSOR_MODEL` to `gpt-5.4-high-fast`.
+   If your account does not support that model, query `GET /v0/models` and replace it with a supported ID.
 5. Apply the Blueprint.
 6. Open the deployed trigger service and confirm `GET /healthz` returns `ok: true`.
 7. Open the Cursor Cloud Agents dashboard and confirm the worker appears as connected.
@@ -76,10 +78,12 @@ For production, prefer a Cursor service account API key when your plan supports 
 
 - `CURSOR_API_KEY`: API key used to call the Cursor Cloud Agents API
 - `CURSOR_TARGET_REPOSITORY`: the single repository this deployment will launch agents against
+- `DEFAULT_CURSOR_MODEL`: explicit model ID for API-triggered runs. This Blueprint defaults to `gpt-5.4-high-fast`.
 - `TRIGGER_HOST`: trigger service host used to build the public callback URL as `https://<host>.onrender.com`
 - `CURSOR_WEBHOOK_SECRET`: shared secret for verifying Cursor webhook callbacks
 
 For local development or non-Render deployments, you can set `TRIGGER_BASE_URL` as an override.
+If your account does not support `gpt-5.4-high-fast`, query `GET /v0/models` with your Cursor API key and set `DEFAULT_CURSOR_MODEL` to one of the returned IDs.
 
 ### Optional provider variables
 
